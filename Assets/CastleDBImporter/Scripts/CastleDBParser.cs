@@ -93,10 +93,15 @@ namespace CastleDBImporter
             public string Display { get; protected set;}
             public ColumnNode(JSONNode sheetValue)
             {
+
                 value = sheetValue;
                 Name = value["name"];
+                if(!CastleDBConfig.NamesHaveSpaces && Name.Contains(" ")) { CastleDBConfig.NamesHaveSpaces = true; }
+                Name = Name.Replace(" ", "_"); // Remove spaces to avoid compiler errors
                 Display = value["display"];
                 TypeStr = value["typeStr"];
+                if(!CastleDBConfig.NamesHaveSpaces && Name.Contains(" ")) { CastleDBConfig.NamesHaveSpaces = true; }
+                TypeStr = TypeStr.Replace(" ", "_");
             }
         }
     }

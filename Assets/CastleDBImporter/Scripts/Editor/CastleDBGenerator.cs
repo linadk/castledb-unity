@@ -173,7 +173,11 @@ namespace {config.GeneratedTypesNamespace}
         {getMethodText}
     }}
 }}";
-                Debug.Log("Generating CDB Class: " + sheet.Name);
+                if (!config.SuppressBuildInfo)
+                {
+                    Debug.Log("Generating CDB Class: " + sheet.Name);
+                }
+
                 File.WriteAllText(scriptPath, fullClassText);
             }
 
@@ -242,11 +246,20 @@ namespace {config.GeneratedTypesNamespace}
         }}
     }}
 }}";
+            if (!config.SuppressBuildInfo)
+            {
+                Debug.Log("Generating CastleDB class");
 
-            Debug.Log("Generating CastleDB class");
+                if (CastleDBConfig.NamesHaveSpaces)
+                {
+                    Debug.Log("Your CastleDB file contains spaces in names! These spaces will be automatically converted to '_'.");
+                }
+
+                Debug.Log("To suppress log messages from import, check the CastleDBConfig flag 'Suppress Import Messages'");
+            }
+
             File.WriteAllText(cdbscriptPath, fullCastle);
             AssetDatabase.Refresh();
-
         }
 
         public static void InitTypePath(CastleDBConfig config)
