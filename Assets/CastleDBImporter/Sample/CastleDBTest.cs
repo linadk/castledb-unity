@@ -20,6 +20,7 @@ public class CastleDBTest : MonoBehaviour
             Debug.Log("[enum] death sound: " + creature.DeathSound);
             Debug.Log("[flag enum] spawn areas: " + creature.Spawn_Areas);
             Debug.Log("[color] color: <color=#" + ColorUtility.ToHtmlStringRGBA(creature.Color) + ">" + creature.Color.ToString() + "</color>");
+            Debug.Log("[img] image : " + creature.Icon);
             foreach (var item in creature.DropsList)
             {
                 Debug.Log($"{creature.Name} drops item {item.item} at rate {item.DropChance}");

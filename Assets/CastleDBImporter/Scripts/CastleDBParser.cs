@@ -2,22 +2,43 @@ using UnityEngine;
 using System.Collections.Generic;
 using SimpleJSON;
 using System;
+using UnityEditor;
+using System.IO;
 
 namespace CastleDBImporter
 {
     public class CastleDBParser
     {
         TextAsset DBTextAsset;
+        TextAsset DBImages;
+
         public RootNode Root {get; private set;}
+        public RootNode ImageRoot { get; private set; }
         public CastleDBParser(TextAsset db)
         {
             DBTextAsset = db;
+
+            GetImageDBPath();
+            //Debug.Log(AssetDatabase.GetAssetPath(DBTextAsset));
             Root = new RootNode(JSON.Parse(DBTextAsset.text));
+            
         }
 
         public void RegenerateDB()
         {
             Root = new RootNode(JSON.Parse(DBTextAsset.text));
+        }
+
+        private void GetImageDBPath()
+        {
+            string dbpath = AssetDatabase.GetAssetPath(DBTextAsset);
+            var typeIndex = dbpath.LastIndexOf(".");
+            var path = dbpath.Substring(0, typeIndex) + ".img";
+            if (File.Exists(path)) { Debug.Log("IT DOES"); }
+
+            DBImages = AssetDatabase.LoadAssetAtPath(path, (typeof(TextAsset))) as TextAsset;
+            Debug.Log(path);
+            Debug.Log(DBImages.text);
         }
 
         public class RootNode
