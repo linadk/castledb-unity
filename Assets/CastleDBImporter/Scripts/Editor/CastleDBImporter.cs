@@ -21,16 +21,9 @@ namespace CastleDBImporter
             EditorApplication.delayCall += new EditorApplication.CallbackFunction(GenerateTypes); // Delay type generation until the asset manager has finished importing
         }
 
-		public CastleDBConfig GetCastleDBConfig()
-		{
-			var guids = AssetDatabase.FindAssets("CastleDBConfig t:CastleDBConfig");
-            var path = AssetDatabase.GUIDToAssetPath(guids[0]);
-            return AssetDatabase.LoadAssetAtPath(path, typeof(CastleDBConfig)) as CastleDBConfig;
-		}
-
         private void GenerateTypes()
         {
-            CastleDBGenerator.GenerateTypes(parser.Root, GetCastleDBConfig());
+            CastleDBGenerator.GenerateTypes(parser.Root, CastleDBConfig.Instance() );
             parser = null;
         }
     }

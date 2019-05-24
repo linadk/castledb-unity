@@ -33,7 +33,7 @@
 				},
 				{
 					"typeStr": "10:Forest,Mountains,Lake,Plains",
-					"name": "SpawnAreas"
+					"name": "Spawn Areas"
 				},
 				{
 					"typeStr": "11",
@@ -60,8 +60,8 @@
 					],
 					"DamageModifier": 1,
 					"DeathSound": 0,
-					"SpawnAreas": 4,
-					"Color": 4744400
+					"Color": 4744400,
+					"Spawn Areas": 4
 				},
 				{
 					"id": "Bear",
@@ -71,8 +71,8 @@
 					"Drops": [],
 					"DamageModifier": 2.2,
 					"DeathSound": 1,
-					"SpawnAreas": 9,
-					"Color": 9723193
+					"Color": 9723193,
+					"Spawn Areas": 9
 				},
 				{
 					"id": "Dragon",
@@ -97,8 +97,8 @@
 					],
 					"DamageModifier": 5.6,
 					"DeathSound": 1,
-					"SpawnAreas": 10,
-					"Color": 13247781
+					"Color": 13247781,
+					"Spawn Areas": 10
 				}
 			],
 			"separators": [],
