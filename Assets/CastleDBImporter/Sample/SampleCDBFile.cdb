@@ -38,6 +38,11 @@
 				{
 					"typeStr": "11",
 					"name": "Color"
+				},
+				{
+					"typeStr": "7",
+					"name": "Icon",
+					"opt": true
 				}
 			],
 			"lines": [
@@ -61,7 +66,8 @@
 					"DamageModifier": 1,
 					"DeathSound": 0,
 					"Color": 4744400,
-					"Spawn Areas": 4
+					"Spawn Areas": 4,
+					"Icon": "e353c67b0230263638bb79c0bde144c5"
 				},
 				{
 					"id": "Bear",
