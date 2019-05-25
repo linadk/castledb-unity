@@ -11,6 +11,9 @@ using UnityEngine;
         [Tooltip("The folder that the generated types will be located in.")]
         public string GeneratedTypesLocation;
 
+        [Tooltip("The folder where database images will be stored")]
+        public string ImagesFolder;
+
         [Tooltip("The namespace that the generated types will be wrappe din.")]
         public string GeneratedTypesNamespace;
 
