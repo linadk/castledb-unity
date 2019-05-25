@@ -93,6 +93,10 @@ namespace CastleDBImporter
                         //look up the line based on the passed in row
                         constructorText += $"{column.Name} = new {config.GeneratedTypesNamespace}.{refType}(root,{config.GeneratedTypesNamespace}.{refType}.GetRowValue(node[\"{column.Name}\"]));\n";
                     }
+                    else if (typeNum == "7") // Image
+                    {
+                        constructorText += $"{column.Name} = Resources.Load<Texture>(node[\"{column.Name}\"]) as Texture;\n";
+                    }
                     else if (typeNum == "11") // Color
                     {
                         constructorText += $"{column.Name} = CastleDB.GetColorFromString( node[\"{column.Name}\"]);\n";

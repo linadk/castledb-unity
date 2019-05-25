@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GUIDColumnName: id
   GeneratedTypesLocation: TestFolder/GeneratedTypes
-  ImagesFolder: TestFolder/Images
+  ImagesFolder: TestFolder/Images/Resources
   GeneratedTypesNamespace: CompiledTypes
-  SuppressBuildInfo: 0
+  SuppressBuildInfo: 1

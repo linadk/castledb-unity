@@ -30,7 +30,7 @@ namespace CastleDBImporter
                 case "6": //ref type
                     return GetRefTypeFromTypeString(column.TypeStr);
                 case "7": // Image
-                    return "string";
+                    return "Texture";
                 case "8": //nested list type
                     return column.Name;
                 case "11": //color

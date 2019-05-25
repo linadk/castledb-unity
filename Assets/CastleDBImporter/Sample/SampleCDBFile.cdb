@@ -71,6 +71,28 @@
 					"Color": 5397460
 				},
 				{
+					"id": "Jellyfish",
+					"Name": "A Golden Jellyfish",
+					"attacksPlayer": false,
+					"BaseDamage": 2,
+					"DamageModifier": 1,
+					"Drops": [
+						{
+							"item": "UltraSword",
+							"DropChance": 20,
+							"PossibleEffects": [
+								{
+									"effect": "poison",
+									"EffectChance": 0
+								}
+							]
+						}
+					],
+					"DeathSound": 0,
+					"Spawn_Areas": 4,
+					"Color": 16762170
+				},
+				{
 					"id": "Bear",
 					"Name": "Above Average Bear",
 					"attacksPlayer": false,
@@ -80,7 +102,7 @@
 					"DeathSound": 1,
 					"Spawn_Areas": 9,
 					"Color": 12223532,
-					"Icon": "e353c67b0230263638bb79c0bde144c5"
+					"Icon": "9d77ec30796e975161ad0f52b3090982"
 				},
 				{
 					"id": "Dragon",
@@ -106,7 +128,8 @@
 					"DamageModifier": 5.6,
 					"DeathSound": 1,
 					"Spawn_Areas": 10,
-					"Color": 13510439
+					"Color": 13510439,
+					"Icon": "a290916a8039072d441b42368a423147"
 				}
 			],
 			"separators": [],
