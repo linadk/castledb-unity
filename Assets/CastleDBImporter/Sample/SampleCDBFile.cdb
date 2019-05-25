@@ -33,11 +33,17 @@
 				},
 				{
 					"typeStr": "10:Forest,Mountains,Lake,Plains",
-					"name": "Spawn Areas"
+					"name": "Spawn_Areas"
 				},
 				{
 					"typeStr": "11",
-					"name": "Color"
+					"name": "Color",
+					"display": null
+				},
+				{
+					"typeStr": "7",
+					"name": "Icon",
+					"opt": true
 				}
 			],
 			"lines": [
@@ -60,8 +66,31 @@
 					],
 					"DamageModifier": 1,
 					"DeathSound": 0,
-					"Color": 4744400,
-					"Spawn Areas": 4
+					"Icon": "e353c67b0230263638bb79c0bde144c5",
+					"Spawn_Areas": 4,
+					"Color": 5397460
+				},
+				{
+					"id": "Jellyfish",
+					"Name": "A Golden Jellyfish",
+					"attacksPlayer": false,
+					"BaseDamage": 2,
+					"DamageModifier": 1,
+					"Drops": [
+						{
+							"item": "UltraSword",
+							"DropChance": 20,
+							"PossibleEffects": [
+								{
+									"effect": "poison",
+									"EffectChance": 0
+								}
+							]
+						}
+					],
+					"DeathSound": 0,
+					"Spawn_Areas": 4,
+					"Color": 16762170
 				},
 				{
 					"id": "Bear",
@@ -71,8 +100,9 @@
 					"Drops": [],
 					"DamageModifier": 2.2,
 					"DeathSound": 1,
-					"Color": 9723193,
-					"Spawn Areas": 9
+					"Spawn_Areas": 9,
+					"Color": 12223532,
+					"Icon": "9d77ec30796e975161ad0f52b3090982"
 				},
 				{
 					"id": "Dragon",
@@ -97,8 +127,9 @@
 					],
 					"DamageModifier": 5.6,
 					"DeathSound": 1,
-					"Color": 13247781,
-					"Spawn Areas": 10
+					"Spawn_Areas": 10,
+					"Color": 13510439,
+					"Icon": "a290916a8039072d441b42368a423147"
 				}
 			],
 			"separators": [],

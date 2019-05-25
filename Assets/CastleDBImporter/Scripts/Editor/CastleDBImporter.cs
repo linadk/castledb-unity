@@ -2,6 +2,9 @@
 using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
 using System.IO;
+using SimpleJSON;
+using System;
+using System.Collections.Generic;
 
 namespace CastleDBImporter
 {
@@ -27,4 +30,5 @@ namespace CastleDBImporter
             parser = null;
         }
     }
+
 }

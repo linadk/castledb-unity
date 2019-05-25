@@ -20,6 +20,7 @@ public ModifiersType Modifiers;
         }
         public class CreaturesType 
  {public Creatures Squid { get { return Get(CompiledTypes.Creatures.RowValues.Squid); } } 
+public Creatures Jellyfish { get { return Get(CompiledTypes.Creatures.RowValues.Jellyfish); } } 
 public Creatures Bear { get { return Get(CompiledTypes.Creatures.RowValues.Bear); } } 
 public Creatures Dragon { get { return Get(CompiledTypes.Creatures.RowValues.Dragon); } } 
 private Creatures Get(CompiledTypes.Creatures.RowValues line) { return new Creatures(parsedDB.Root, line); }

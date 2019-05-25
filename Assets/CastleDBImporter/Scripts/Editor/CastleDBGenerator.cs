@@ -80,18 +80,22 @@ namespace CastleDBImporter
                     string castText = CastleDBUtils.GetCastStringFromCastleDBTypeStr(column.TypeStr);
                     string enumCast = "";
                     string typeNum = CastleDBUtils.GetTypeNumFromCastleDBTypeString(column.TypeStr);
-                    if(typeNum == "8")
+                    if (typeNum == "8")
                     {
                         //list type
                         constructorText += $"foreach(var item in node[\"{column.Name}\"]) {{ {column.Name}List.Add(new {column.Name}(root, item));}}\n";
                     }
-                    else if(typeNum == "6")
+                    else if (typeNum == "6")
                     {
                         //working area:
                         //ref type
                         string refType = CastleDBUtils.GetTypeFromCastleDBColumn(column);
                         //look up the line based on the passed in row
                         constructorText += $"{column.Name} = new {config.GeneratedTypesNamespace}.{refType}(root,{config.GeneratedTypesNamespace}.{refType}.GetRowValue(node[\"{column.Name}\"]));\n";
+                    }
+                    else if (typeNum == "7") // Image
+                    {
+                        constructorText += $"{column.Name} = Resources.Load<Texture>(node[\"{column.Name}\"]) as Texture;\n";
                     }
                     else if (typeNum == "11") // Color
                     {
@@ -264,11 +268,14 @@ namespace {config.GeneratedTypesNamespace}
 
         public static void InitTypePath(CastleDBConfig config)
         {
-            var path = $"{Application.dataPath}/{config.GeneratedTypesLocation}";
-            if (Directory.Exists (path))
-            {
-                //we've generated this before, so delete the assets in the folder and refresh the DB
-                var files = Directory.GetFiles(path);
+            InitPath(config.GeneratedTypesLocation);
+        }
+
+        public static void InitPath(string path)
+        {
+            var full_path = $"{ Application.dataPath}/{ path }";
+            if (Directory.Exists(full_path)){
+                var files = Directory.GetFiles(full_path);
                 foreach (var file in files)
                 {
                     FileUtil.DeleteFileOrDirectory(file);
@@ -277,9 +284,10 @@ namespace {config.GeneratedTypesNamespace}
             }
             else
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(full_path);
                 AssetDatabase.Refresh();
             }
+
         }
     }
 }
