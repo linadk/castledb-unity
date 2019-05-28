@@ -34,11 +34,11 @@ namespace CastleDBImporter
                     {
                         if(CastleDBUtils.GetTypeNumFromCastleDBTypeString(column.TypeStr) == "8")
                         {
-                            fieldText += ($"public List<{fieldType}> {column.Name}List = new List<{fieldType}>();\n");
+                            fieldText += ($"public List<{fieldType}> {column.Name}List = new List<{fieldType}>();\r\n");
                         }
                         else
                         {
-                            fieldText += ($"public {fieldType} {column.Name};\n");
+                            fieldText += ($"public {fieldType} {column.Name};\r\n");
                         }
                     }
                     else //enum type
@@ -47,7 +47,7 @@ namespace CastleDBImporter
                         string enumEntries = "";
                         if(CastleDBUtils.GetTypeNumFromCastleDBTypeString(column.TypeStr) == "10") //flag
                         {
-                            fieldText += ($"public {column.Name}Flag {column.Name};\n");
+                            fieldText += ($"public {column.Name}Flag {column.Name};\r\n");
                             for (int val = 0; val < enumValueNames.Length; val++)
                             {
                                 enumEntries += (enumValueNames[val] + " = " + (int)Math.Pow(2, val));
@@ -57,7 +57,7 @@ namespace CastleDBImporter
                         }
                         else
                         {
-                            fieldText += ($"public {column.Name}Enum {column.Name};\n");
+                            fieldText += ($"public {column.Name}Enum {column.Name};\r\n");
                             for (int val = 0; val < enumValueNames.Length; val++)
                             {
                                 enumEntries += (enumValueNames[val] + " = " + val);
@@ -72,7 +72,7 @@ namespace CastleDBImporter
                 string constructorText = "";
                 if(!sheet.NestedType)
                 {
-                    constructorText += $"SimpleJSON.JSONNode node = root.GetSheetWithName(\"{sheet.Name}\").Rows[(int)line];\n";
+                    constructorText += $"SimpleJSON.JSONNode node = root.GetSheetWithName(\"{sheet.Name}\").Rows[(int)line];\r\n";
                 }
                 for (int i = 0; i < sheet.Columns.Count; i++)
                 {
@@ -83,7 +83,7 @@ namespace CastleDBImporter
                     if (typeNum == "8")
                     {
                         //list type
-                        constructorText += $"foreach(var item in node[\"{column.Name}\"]) {{ {column.Name}List.Add(new {column.Name}(root, item));}}\n";
+                        constructorText += $"foreach(var item in node[\"{column.Name}\"]) {{ {column.Name}List.Add(new {column.Name}(root, item));}}\r\n";
                     }
                     else if (typeNum == "6")
                     {
@@ -91,15 +91,15 @@ namespace CastleDBImporter
                         //ref type
                         string refType = CastleDBUtils.GetTypeFromCastleDBColumn(column);
                         //look up the line based on the passed in row
-                        constructorText += $"{column.Name} = new {config.GeneratedTypesNamespace}.{refType}(root,{config.GeneratedTypesNamespace}.{refType}.GetRowValue(node[\"{column.Name}\"]));\n";
+                        constructorText += $"{column.Name} = new {config.GeneratedTypesNamespace}.{refType}(root,{config.GeneratedTypesNamespace}.{refType}.GetRowValue(node[\"{column.Name}\"]));\r\n";
                     }
                     else if (typeNum == "7") // Image
                     {
-                        constructorText += $"{column.Name} = Resources.Load<Texture>(node[\"{column.Name}\"]) as Texture;\n";
+                        constructorText += $"{column.Name} = Resources.Load<Texture>(node[\"{column.Name}\"]) as Texture;\r\n";
                     }
                     else if (typeNum == "11") // Color
                     {
-                        constructorText += $"{column.Name} = CastleDB.GetColorFromString( node[\"{column.Name}\"]);\n";
+                        constructorText += $"{column.Name} = CastleDB.GetColorFromString( node[\"{column.Name}\"]);\r\n";
                     }
                     else
                     {
@@ -111,7 +111,7 @@ namespace CastleDBImporter
                         {
                             enumCast = $"({column.Name}Enum)";
                         }
-                        constructorText += $"{column.Name} = {enumCast}node[\"{column.Name}\"]{castText};\n";
+                        constructorText += $"{column.Name} = {enumCast}node[\"{column.Name}\"]{castText};\r\n";
                     }
                 }
 
@@ -119,15 +119,15 @@ namespace CastleDBImporter
                 string possibleValuesText = "";
                 if(!sheet.NestedType)
                 {
-                    possibleValuesText += $"public enum RowValues {{ \n";
+                    possibleValuesText += $"public enum RowValues {{ \r\n";
 
                     for (int i = 0; i < sheet.Rows.Count; i++)
                     {
                         string rowName = sheet.Rows[i][config.GUIDColumnName];
                         possibleValuesText += rowName;
-                        if(i + 1 < sheet.Rows.Count){ possibleValuesText += ", \n";}
+                        if(i + 1 < sheet.Rows.Count){ possibleValuesText += ", \r\n";}
                     }
-                    possibleValuesText += "\n }";
+                    possibleValuesText += "\r\n }";
                 }
 
                 string getMethodText = "";
@@ -157,7 +157,7 @@ public static {sheet.Name}.RowValues GetRowValue(string name)
                 {
                     ctor = $"public {sheet.Name} (CastleDBParser.RootNode root, SimpleJSON.JSONNode node)";
                 }
-                // string usings = "using UnityEngine;\n using System;\n using System.Collections.Generic;\n using SimpleJSON;\n using CastleDBImporter;\n";
+                // string usings = "using UnityEngine;\r\n using System;\r\n using System.Collections.Generic;\r\n using SimpleJSON;\r\n using CastleDBImporter;\r\n";
                 string fullClassText = $@"
 using UnityEngine;
 using System;
@@ -195,17 +195,17 @@ namespace {config.GeneratedTypesNamespace}
             foreach (CastleDBParser.SheetNode sheet in root.Sheets)
             {
                 if(sheet.NestedType){continue;} //only write main types to CastleDB
-                cdbfields += $"public {sheet.Name}Type {sheet.Name};\n";
+                cdbfields += $"public {sheet.Name}Type {sheet.Name};\r\n";
                 cdbconstructorBody += $"{sheet.Name} = new {sheet.Name}Type();";
 
                 //get a list of all the row names
-                classTexts += $"public class {sheet.Name}Type \n {{";
+                classTexts += $"public class {sheet.Name}Type \r\n {{";
                 for (int i = 0; i < sheet.Rows.Count; i++)
                 {
                     string rowName = sheet.Rows[i][config.GUIDColumnName];
-                    classTexts += $"public {sheet.Name} {rowName} {{ get {{ return Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues.{rowName}); }} }} \n";
+                    classTexts += $"public {sheet.Name} {rowName} {{ get {{ return Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues.{rowName}); }} }} \r\n";
                 }
-                classTexts += $"private {sheet.Name} Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\n";
+                classTexts += $"private {sheet.Name} Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\r\n";
                 classTexts += $@"
                 public {sheet.Name}[] GetAll() 
                 {{
@@ -217,7 +217,7 @@ namespace {config.GeneratedTypesNamespace}
                     }}
                     return returnList;
                 }}";
-                classTexts += $"\n }} //END OF {sheet.Name} \n";
+                classTexts += $"\r\n }} //END OF {sheet.Name} \r\n";
             }
 
             string fullCastle = $@"
