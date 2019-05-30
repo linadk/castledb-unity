@@ -207,30 +207,30 @@ namespace {config.GeneratedTypesNamespace}
             foreach (CastleDBParser.SheetNode sheet in root.Sheets)
             {
                 if(sheet.NestedType){continue;} //only write main types to CastleDB
-                cdbfields += $"public {sheet.Name}Type {sheet.Name};\r\n";
-                cdbconstructorBody += $"{sheet.Name} = new {sheet.Name}Type();";
+                cdbfields += $"        public {sheet.Name}Type {sheet.Name};\r\n";
+                cdbconstructorBody += $"        {sheet.Name} = new {sheet.Name}Type();\r\n";
 
                 //get a list of all the row names
-                classTexts += $"public class {sheet.Name}Type \r\n {{";
+                classTexts += $"        public class {sheet.Name}Type \r\n        {{\r\n";
                 for (int i = 0; i < sheet.Rows.Count; i++)
                 {
                     string rowName = sheet.Rows[i][config.GUIDColumnName];
-                    classTexts += $"        public {sheet.Name} {rowName} {{ get {{ return Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues.{rowName}); }} }} \r\n";
+                    classTexts += $"           public {sheet.Name} {rowName} {{ get {{ return Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues.{rowName}); }} }} \r\n";
                 }
 
-                classTexts += $"private {sheet.Name} Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\r\n";
+                classTexts += $"           private {sheet.Name} Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\r\n";
                 classTexts += $@"
-                public {sheet.Name}[] GetAll() 
-                {{
-                    var values = ({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues[])Enum.GetValues(typeof({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues));
-                    {sheet.Name}[] returnList = new {sheet.Name}[values.Length];
-                    for (int i = 0; i < values.Length; i++)
-                    {{
-                        returnList[i] = Get(values[i]);
-                    }}
-                    return returnList;
-                }}";
-                classTexts += $"\r\n }} //END OF {sheet.Name} \r\n";
+           public {sheet.Name}[] GetAll() 
+           {{
+               var values = ({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues[])Enum.GetValues(typeof({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues));
+               {sheet.Name}[] returnList = new {sheet.Name}[values.Length];
+               for (int i = 0; i < values.Length; i++)
+               {{
+                   returnList[i] = Get(values[i]);
+               }}
+               return returnList;
+           }}";
+             classTexts += $"\r\n        }} //END OF {sheet.Name} \r\n\r\n";
             }
 
             string fullCastle = $@"
@@ -244,13 +244,15 @@ namespace {config.GeneratedTypesNamespace}
     public class CastleDB
     {{
         static CastleDBParser parsedDB;
-        {cdbfields}
+{cdbfields}
+        
+{classTexts}
+
         public CastleDB(TextAsset castleDBAsset)
         {{
             parsedDB = new CastleDBParser(castleDBAsset);
             {cdbconstructorBody}
         }}
-        {classTexts}
 
         // Convert CastleDB color string to Unity Color type.
         public static Color GetColorFromString( string color)
