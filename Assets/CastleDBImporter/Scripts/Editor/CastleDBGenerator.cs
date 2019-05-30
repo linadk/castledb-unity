@@ -16,6 +16,7 @@ namespace CastleDBImporter
             // Create scripts
             List<string> scripts = new List<string>();
             CastleDBConfig config = configFile;
+            String FieldIndent = "        ";
 
             InitTypePath(config);
 
@@ -28,17 +29,18 @@ namespace CastleDBImporter
                 string fieldText = "";
                 for (int i = 0; i < sheet.Columns.Count; i++)
                 {
+                    fieldText += FieldIndent;
                     CastleDBParser.ColumnNode column = sheet.Columns[i];
                     string fieldType = CastleDBUtils.GetTypeFromCastleDBColumn(column);
                     if(fieldType != "Enum") //non-enum, normal field
                     {
                         if(CastleDBUtils.GetTypeNumFromCastleDBTypeString(column.TypeStr) == "8")
                         {
-                            fieldText += ($"public List<{fieldType}> {column.Name}List = new List<{fieldType}>();\n");
+                            fieldText += ($"public List<{fieldType}> {column.Name}List = new List<{fieldType}>();");
                         }
                         else
                         {
-                            fieldText += ($"public {fieldType} {column.Name};\n");
+                            fieldText += ($"public {fieldType} {column.Name};");
                         }
                     }
                     else //enum type
@@ -47,7 +49,7 @@ namespace CastleDBImporter
                         string enumEntries = "";
                         if(CastleDBUtils.GetTypeNumFromCastleDBTypeString(column.TypeStr) == "10") //flag
                         {
-                            fieldText += ($"public {column.Name}Flag {column.Name};\n");
+                            fieldText += ($"public {column.Name}Flag {column.Name};");
                             for (int val = 0; val < enumValueNames.Length; val++)
                             {
                                 enumEntries += (enumValueNames[val] + " = " + (int)Math.Pow(2, val));
@@ -57,7 +59,7 @@ namespace CastleDBImporter
                         }
                         else
                         {
-                            fieldText += ($"public {column.Name}Enum {column.Name};\n");
+                            fieldText += ($"public {column.Name}Enum {column.Name};");
                             for (int val = 0; val < enumValueNames.Length; val++)
                             {
                                 enumEntries += (enumValueNames[val] + " = " + val);
@@ -66,16 +68,37 @@ namespace CastleDBImporter
                             fieldText += ($"public enum {column.Name}Enum {{  {enumEntries} }}");
                         }
                     }
+
+                    fieldText += "\r\n";
+
                 }
+
+                #region("Row Values Field")
+                string possibleValuesText = "";
+                if (!sheet.NestedType)
+                {
+                    possibleValuesText += $"public enum RowValues {{";
+
+                    for (int i = 0; i < sheet.Rows.Count; i++)
+                    {
+                        string rowName = sheet.Rows[i][config.GUIDColumnName];
+                        possibleValuesText += rowName;
+                        if (i + 1 < sheet.Rows.Count) { possibleValuesText += " , "; }
+                    }
+                    possibleValuesText += " }\r\n";
+                }
+                #endregion
 
                 //generate the constructor that sets the fields based on the passed in value
                 string constructorText = "";
-                if(!sheet.NestedType)
+                string constructorIndent = "            ";
+                if (!sheet.NestedType)
                 {
-                    constructorText += $"SimpleJSON.JSONNode node = root.GetSheetWithName(\"{sheet.Name}\").Rows[(int)line];\n";
+                    constructorText += $"{constructorIndent}SimpleJSON.JSONNode node = root.GetSheetWithName(\"{sheet.Name}\").Rows[(int)line];\r\n";
                 }
                 for (int i = 0; i < sheet.Columns.Count; i++)
                 {
+                    constructorText += constructorIndent;
                     CastleDBParser.ColumnNode column = sheet.Columns[i];
                     string castText = CastleDBUtils.GetCastStringFromCastleDBTypeStr(column.TypeStr);
                     string enumCast = "";
@@ -83,7 +106,7 @@ namespace CastleDBImporter
                     if (typeNum == "8")
                     {
                         //list type
-                        constructorText += $"foreach(var item in node[\"{column.Name}\"]) {{ {column.Name}List.Add(new {column.Name}(root, item));}}\n";
+                        constructorText += $"foreach(var item in node[\"{column.Name}\"]) {{ {column.Name}List.Add(new {column.Name}(root, item));}}";
                     }
                     else if (typeNum == "6")
                     {
@@ -91,15 +114,15 @@ namespace CastleDBImporter
                         //ref type
                         string refType = CastleDBUtils.GetTypeFromCastleDBColumn(column);
                         //look up the line based on the passed in row
-                        constructorText += $"{column.Name} = new {config.GeneratedTypesNamespace}.{refType}(root,{config.GeneratedTypesNamespace}.{refType}.GetRowValue(node[\"{column.Name}\"]));\n";
+                        constructorText += $"{column.Name} = new {config.GeneratedTypesNamespace}.{refType}(root,{config.GeneratedTypesNamespace}.{refType}.GetRowValue(node[\"{column.Name}\"]));";
                     }
                     else if (typeNum == "7") // Image
                     {
-                        constructorText += $"{column.Name} = Resources.Load<Texture>(node[\"{column.Name}\"]) as Texture;\n";
+                        constructorText += $"{column.Name} = Resources.Load<Texture>(node[\"{column.Name}\"]) as Texture;";
                     }
                     else if (typeNum == "11") // Color
                     {
-                        constructorText += $"{column.Name} = CastleDB.GetColorFromString( node[\"{column.Name}\"]);\n";
+                        constructorText += $"{column.Name} = CastleDB.GetColorFromString( node[\"{column.Name}\"]);";
                     }
                     else
                     {
@@ -111,41 +134,30 @@ namespace CastleDBImporter
                         {
                             enumCast = $"({column.Name}Enum)";
                         }
-                        constructorText += $"{column.Name} = {enumCast}node[\"{column.Name}\"]{castText};\n";
+                        constructorText += $"{column.Name} = {enumCast}node[\"{column.Name}\"]{castText};";
                     }
+
+                    constructorText += "\r\n";
                 }
 
-                //need to construct an enum of possible types
-                string possibleValuesText = "";
-                if(!sheet.NestedType)
-                {
-                    possibleValuesText += $"public enum RowValues {{ \n";
 
-                    for (int i = 0; i < sheet.Rows.Count; i++)
-                    {
-                        string rowName = sheet.Rows[i][config.GUIDColumnName];
-                        possibleValuesText += rowName;
-                        if(i + 1 < sheet.Rows.Count){ possibleValuesText += ", \n";}
-                    }
-                    possibleValuesText += "\n }";
-                }
 
                 string getMethodText = "";
                 if(!sheet.NestedType)
                 {
                     getMethodText += $@"
-public static {sheet.Name}.RowValues GetRowValue(string name)
-{{
-    var values = (RowValues[])Enum.GetValues(typeof(RowValues));
-    for (int i = 0; i < values.Length; i++)
-    {{
-        if(values[i].ToString() == name)
+        public static {sheet.Name}.RowValues GetRowValue(string name)
         {{
-            return values[i];
-        }}
-    }}
-    return values[0];
-}}";
+            var values = (RowValues[])Enum.GetValues(typeof(RowValues));
+            for (int i = 0; i < values.Length; i++)
+            {{
+                if(values[i].ToString() == name)
+                {{
+                    return values[i];
+                }}
+            }}
+            return values[0];
+        }}";
                 }
 
                 string ctor = "";
@@ -157,7 +169,7 @@ public static {sheet.Name}.RowValues GetRowValue(string name)
                 {
                     ctor = $"public {sheet.Name} (CastleDBParser.RootNode root, SimpleJSON.JSONNode node)";
                 }
-                // string usings = "using UnityEngine;\n using System;\n using System.Collections.Generic;\n using SimpleJSON;\n using CastleDBImporter;\n";
+                // string usings = "using UnityEngine;\r\n using System;\r\n using System.Collections.Generic;\r\n using SimpleJSON;\r\n using CastleDBImporter;\r\n";
                 string fullClassText = $@"
 using UnityEngine;
 using System;
@@ -168,11 +180,11 @@ namespace {config.GeneratedTypesNamespace}
 {{ 
     public class {sheet.Name}
     {{
-        {fieldText}
+{fieldText}
         {possibleValuesText} 
         {ctor} 
         {{
-            {constructorText}
+{constructorText}
         }}  
         {getMethodText}
     }}
@@ -195,29 +207,30 @@ namespace {config.GeneratedTypesNamespace}
             foreach (CastleDBParser.SheetNode sheet in root.Sheets)
             {
                 if(sheet.NestedType){continue;} //only write main types to CastleDB
-                cdbfields += $"public {sheet.Name}Type {sheet.Name};\n";
-                cdbconstructorBody += $"{sheet.Name} = new {sheet.Name}Type();";
+                cdbfields += $"        public {sheet.Name}Type {sheet.Name};\r\n";
+                cdbconstructorBody += $"        {sheet.Name} = new {sheet.Name}Type();\r\n";
 
                 //get a list of all the row names
-                classTexts += $"public class {sheet.Name}Type \n {{";
+                classTexts += $"        public class {sheet.Name}Type \r\n        {{\r\n";
                 for (int i = 0; i < sheet.Rows.Count; i++)
                 {
                     string rowName = sheet.Rows[i][config.GUIDColumnName];
-                    classTexts += $"public {sheet.Name} {rowName} {{ get {{ return Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues.{rowName}); }} }} \n";
+                    classTexts += $"           public {sheet.Name} {rowName} {{ get {{ return Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues.{rowName}); }} }} \r\n";
                 }
-                classTexts += $"private {sheet.Name} Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\n";
+
+                classTexts += $"           private {sheet.Name} Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\r\n";
                 classTexts += $@"
-                public {sheet.Name}[] GetAll() 
-                {{
-                    var values = ({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues[])Enum.GetValues(typeof({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues));
-                    {sheet.Name}[] returnList = new {sheet.Name}[values.Length];
-                    for (int i = 0; i < values.Length; i++)
-                    {{
-                        returnList[i] = Get(values[i]);
-                    }}
-                    return returnList;
-                }}";
-                classTexts += $"\n }} //END OF {sheet.Name} \n";
+           public {sheet.Name}[] GetAll() 
+           {{
+               var values = ({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues[])Enum.GetValues(typeof({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues));
+               {sheet.Name}[] returnList = new {sheet.Name}[values.Length];
+               for (int i = 0; i < values.Length; i++)
+               {{
+                   returnList[i] = Get(values[i]);
+               }}
+               return returnList;
+           }}";
+             classTexts += $"\r\n        }} //END OF {sheet.Name} \r\n\r\n";
             }
 
             string fullCastle = $@"
@@ -231,13 +244,15 @@ namespace {config.GeneratedTypesNamespace}
     public class CastleDB
     {{
         static CastleDBParser parsedDB;
-        {cdbfields}
+{cdbfields}
+        
+{classTexts}
+
         public CastleDB(TextAsset castleDBAsset)
         {{
             parsedDB = new CastleDBParser(castleDBAsset);
             {cdbconstructorBody}
         }}
-        {classTexts}
 
         // Convert CastleDB color string to Unity Color type.
         public static Color GetColorFromString( string color)

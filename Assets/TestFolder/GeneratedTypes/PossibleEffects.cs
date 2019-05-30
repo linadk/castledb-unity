@@ -9,13 +9,13 @@ namespace CompiledTypes
     public class PossibleEffects
     {
         public Modifiers effect;
-public int EffectChance;
+        public int EffectChance;
 
          
         public PossibleEffects (CastleDBParser.RootNode root, SimpleJSON.JSONNode node) 
         {
             effect = new CompiledTypes.Modifiers(root,CompiledTypes.Modifiers.GetRowValue(node["effect"]));
-EffectChance = node["EffectChance"].AsInt;
+            EffectChance = node["EffectChance"].AsInt;
 
         }  
         
