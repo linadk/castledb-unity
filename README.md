@@ -128,11 +128,10 @@ I.E. don't use spaces in your column names, weird characters, etc. *This also ap
 
 ### TODO  
 While this repo is ready to be used for general purpose cases, there is still some work to be done! Happy to accept any pull requests that tackle these issues.
-* Add in CastleDB Color support.
 * Convert all the generated string concatentation to use StringBuilder.
 * Figure out a better guide for adding CastleDB Custom Types.
 * Document way to add in your own CustomType to match with a predefined Type in Unity.
-* Currently do not have file types or Image types implemented. This would require some preconfiguration steps that seem unique to every user so I'm not sure if it should be added.
+* Currently do not have custom file types implemented. This would require some preconfiguration steps that seem unique to every user so I'm not sure if it should be added.
 * CastleDB also has a map/level creator that is not used at all here. Could be interesting to implement.
 
 ### References
