@@ -295,12 +295,10 @@ namespace {config.GeneratedTypesNamespace}
                 {
                     FileUtil.DeleteFileOrDirectory(file);
                 }
-                AssetDatabase.Refresh();
             }
             else
             {
                 Directory.CreateDirectory(full_path);
-                AssetDatabase.Refresh();
             }
 
         }
