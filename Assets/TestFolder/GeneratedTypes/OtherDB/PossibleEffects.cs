@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using SimpleJSON;
 using CastleDBImporter;
-namespace CompiledTypes
+using CompiledTypes.OtherDB;
+
+namespace CompiledTypes.OtherDB
 { 
     public class PossibleEffects
     {
@@ -14,7 +16,7 @@ namespace CompiledTypes
          
         public PossibleEffects (CastleDBParser.RootNode root, SimpleJSON.JSONNode node) 
         {
-            effect = new CompiledTypes.Modifiers(root,CompiledTypes.Modifiers.GetRowValue(node["effect"]));
+            effect = new Modifiers(root,Modifiers.GetRowValue(node["effect"]));
             EffectChance = node["EffectChance"].AsInt;
 
         }  

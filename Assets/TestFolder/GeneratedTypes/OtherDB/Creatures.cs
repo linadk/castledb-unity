@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using SimpleJSON;
 using CastleDBImporter;
-namespace CompiledTypes
+using CompiledTypes.OtherDB;
+
+namespace CompiledTypes.OtherDB
 { 
     public class Creatures
     {
@@ -32,7 +34,7 @@ namespace CompiledTypes
             foreach(var item in node["Drops"]) { DropsList.Add(new Drops(root, item));}
             DeathSound = (DeathSoundEnum)node["DeathSound"].AsInt;
             Spawn_Areas = (Spawn_AreasFlag)node["Spawn_Areas"].AsInt;
-            Color = CastleDB.GetColorFromString( node["Color"]);
+            Color = CastleDBUtils.GetColorFromString( node["Color"]);
             Icon = Resources.Load<Texture>(node["Icon"]) as Texture;
 
         }  

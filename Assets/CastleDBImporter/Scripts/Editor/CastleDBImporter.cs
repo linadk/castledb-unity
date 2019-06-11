@@ -12,11 +12,14 @@ namespace CastleDBImporter
 	public class CastleDBImporter : ScriptedImporter
 	{
         private CastleDBParser parser = null;
+        private string dbname = "";
 
 		public override void OnImportAsset(AssetImportContext ctx)
 		{
-			TextAsset castle = new TextAsset(File.ReadAllText(ctx.assetPath));
+            if (HasDuplicateDB(ref ctx)) { Debug.LogWarning("Cannot load CastleDB database '" + ctx.assetPath + "' because a DB of the same name already exists! Please rename one of your .cdb files!"); return; }
+            dbname = Path.GetFileNameWithoutExtension(ctx.assetPath);
 
+            TextAsset castle = new TextAsset(File.ReadAllText(ctx.assetPath));
 			ctx.AddObjectToAsset("main obj", castle);
 			ctx.SetMainObject(castle);
 
@@ -26,8 +29,28 @@ namespace CastleDBImporter
 
         private void GenerateTypes()
         {
-            CastleDBGenerator.GenerateTypes(parser.Root, CastleDBConfig.Instance() );
+            CastleDBGenerator.GenerateTypes(parser.Root, CastleDBConfig.Instance() , dbname );
             parser = null;
+            dbname = "";
+        }
+
+        private bool HasDuplicateDB(ref AssetImportContext ctx)
+        {
+            var dbname = Path.GetFileNameWithoutExtension(ctx.assetPath);
+
+            var dupes = AssetDatabase.FindAssets(dbname);
+
+            // Check all guids for dupe cdb files
+            foreach (string guid1 in dupes)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid1);
+                if(path.ToLower().EndsWith(".cdb") && path != ctx.assetPath)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 
