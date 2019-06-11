@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using CompiledTypes;
+using CompiledTypes.OtherDB;
 
 [ExecuteInEditMode]
 public class CastleDBTest : MonoBehaviour
@@ -13,7 +13,7 @@ public class CastleDBTest : MonoBehaviour
     {
         if(test)
         {
-            CastleDB DB = new CastleDB(CastleDBAsset);
+            OtherDB DB = new OtherDB(CastleDBAsset);
             Creatures creature = DB.Creatures.Dragon;
             Debug.Log("[string] name: " + creature.Name);
             Debug.Log("[bool] attacks player: " + creature.attacksPlayer);

@@ -11,7 +11,7 @@ namespace CastleDBImporter
 {
     public class CastleDBGenerator
     {
-        public static void GenerateTypes(CastleDBParser.RootNode root, CastleDBConfig configFile)
+        public static void GenerateTypes(CastleDBParser.RootNode root, CastleDBConfig configFile , string dbname )
         {
             // Create scripts
             List<string> scripts = new List<string>();
@@ -19,10 +19,10 @@ namespace CastleDBImporter
             String FieldIndent = "        ";
 
             InitTypePath(config);
-
+            InitPath(configFile.GeneratedTypesLocation + $"/{dbname}/");
             foreach (CastleDBParser.SheetNode sheet in root.Sheets)
             {
-                string scriptPath = $"Assets/{config.GeneratedTypesLocation}/{sheet.Name}.cs";
+                string scriptPath = $"Assets/{config.GeneratedTypesLocation}/{dbname}/{sheet.Name}.cs";
                 scripts.Add(scriptPath);
 
                 //generate fields
@@ -114,7 +114,7 @@ namespace CastleDBImporter
                         //ref type
                         string refType = CastleDBUtils.GetTypeFromCastleDBColumn(column);
                         //look up the line based on the passed in row
-                        constructorText += $"{column.Name} = new {config.GeneratedTypesNamespace}.{refType}(root,{config.GeneratedTypesNamespace}.{refType}.GetRowValue(node[\"{column.Name}\"]));";
+                        constructorText += $"{column.Name} = new {refType}(root,{refType}.GetRowValue(node[\"{column.Name}\"]));";
                     }
                     else if (typeNum == "7") // Image
                     {
@@ -122,7 +122,7 @@ namespace CastleDBImporter
                     }
                     else if (typeNum == "11") // Color
                     {
-                        constructorText += $"{column.Name} = CastleDB.GetColorFromString( node[\"{column.Name}\"]);";
+                        constructorText += $"{column.Name} = CastleDBUtils.GetColorFromString( node[\"{column.Name}\"]);";
                     }
                     else
                     {
@@ -176,7 +176,9 @@ using System;
 using System.Collections.Generic;
 using SimpleJSON;
 using CastleDBImporter;
-namespace {config.GeneratedTypesNamespace}
+using {config.GeneratedTypesNamespace}.{dbname};
+
+namespace {config.GeneratedTypesNamespace}.{dbname}
 {{ 
     public class {sheet.Name}
     {{
@@ -198,7 +200,7 @@ namespace {config.GeneratedTypesNamespace}
             }
 
             //build the CastleDB file
-            string cdbscriptPath = $"Assets/{config.GeneratedTypesLocation}/CastleDB.cs";
+            string cdbscriptPath = $"Assets/{config.GeneratedTypesLocation}/{dbname}/{dbname}.cs";
             scripts.Add(cdbscriptPath);
             //fields
             string cdbfields = "";
@@ -208,21 +210,21 @@ namespace {config.GeneratedTypesNamespace}
             {
                 if(sheet.NestedType){continue;} //only write main types to CastleDB
                 cdbfields += $"        public {sheet.Name}Type {sheet.Name};\r\n";
-                cdbconstructorBody += $"        {sheet.Name} = new {sheet.Name}Type();\r\n";
+                cdbconstructorBody += $"            {sheet.Name} = new {sheet.Name}Type();\r\n";
 
                 //get a list of all the row names
                 classTexts += $"        public class {sheet.Name}Type \r\n        {{\r\n";
                 for (int i = 0; i < sheet.Rows.Count; i++)
                 {
                     string rowName = sheet.Rows[i][config.GUIDColumnName];
-                    classTexts += $"           public {sheet.Name} {rowName} {{ get {{ return Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues.{rowName}); }} }} \r\n";
+                    classTexts += $"           public {sheet.Name} {rowName} {{ get {{ return Get({configFile.GeneratedTypesNamespace}.{dbname}.{sheet.Name}.RowValues.{rowName}); }} }} \r\n";
                 }
 
-                classTexts += $"           private {sheet.Name} Get({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\r\n";
+                classTexts += $"           private {sheet.Name} Get({sheet.Name}.RowValues line) {{ return new {sheet.Name}(parsedDB.Root, line); }}\r\n";
                 classTexts += $@"
            public {sheet.Name}[] GetAll() 
            {{
-               var values = ({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues[])Enum.GetValues(typeof({config.GeneratedTypesNamespace}.{sheet.Name}.RowValues));
+               var values = ({sheet.Name}.RowValues[])Enum.GetValues(typeof({sheet.Name}.RowValues));
                {sheet.Name}[] returnList = new {sheet.Name}[values.Length];
                for (int i = 0; i < values.Length; i++)
                {{
@@ -238,30 +240,21 @@ using UnityEngine;
 using CastleDBImporter;
 using System.Collections.Generic;
 using System;
+using {config.GeneratedTypesNamespace}.{dbname};
 
-namespace {config.GeneratedTypesNamespace}
+namespace {config.GeneratedTypesNamespace}.{dbname}
 {{
-    public class CastleDB
+    public class {dbname}
     {{
         static CastleDBParser parsedDB;
 {cdbfields}
         
 {classTexts}
 
-        public CastleDB(TextAsset castleDBAsset)
+        public {dbname}(TextAsset castleDBAsset)
         {{
             parsedDB = new CastleDBParser(castleDBAsset);
-            {cdbconstructorBody}
-        }}
-
-        // Convert CastleDB color string to Unity Color type.
-        public static Color GetColorFromString( string color)
-        {{
-            int.TryParse(color, out int icolor);
-            float blue = ((icolor >> 0) & 255) / 255.0f;
-            float green = ((icolor >> 8) & 255) / 255.0f;
-            float red = ((icolor >> 16) & 255) / 255.0f;
-            return new Color(red, green, blue);
+{cdbconstructorBody}
         }}
     }}
 }}";

@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using SimpleJSON;
 using CastleDBImporter;
-namespace CompiledTypes
+using CompiledTypes.OtherDB;
+
+namespace CompiledTypes.OtherDB
 { 
     public class Drops
     {
@@ -15,7 +17,7 @@ namespace CompiledTypes
          
         public Drops (CastleDBParser.RootNode root, SimpleJSON.JSONNode node) 
         {
-            item = new CompiledTypes.Items(root,CompiledTypes.Items.GetRowValue(node["item"]));
+            item = new Items(root,Items.GetRowValue(node["item"]));
             DropChance = node["DropChance"].AsInt;
             foreach(var item in node["PossibleEffects"]) { PossibleEffectsList.Add(new PossibleEffects(root, item));}
 

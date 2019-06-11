@@ -4,26 +4,28 @@ using System;
 using System.Collections.Generic;
 using SimpleJSON;
 using CastleDBImporter;
-namespace CompiledTypes
+using CompiledTypes.OtherDB;
+
+namespace CompiledTypes.OtherDB
 { 
-    public class Items
+    public class Modifiers
     {
         public string id;
         public string name;
-        public int Weight;
+        public int change;
 
-        public enum RowValues {HealingPotion , PoisonPotion , UltraSword }
+        public enum RowValues {poison , enchanted }
  
-        public Items (CastleDBParser.RootNode root, RowValues line) 
+        public Modifiers (CastleDBParser.RootNode root, RowValues line) 
         {
-            SimpleJSON.JSONNode node = root.GetSheetWithName("Items").Rows[(int)line];
+            SimpleJSON.JSONNode node = root.GetSheetWithName("Modifiers").Rows[(int)line];
             id = node["id"];
             name = node["name"];
-            Weight = node["Weight"].AsInt;
+            change = node["change"].AsInt;
 
         }  
         
-        public static Items.RowValues GetRowValue(string name)
+        public static Modifiers.RowValues GetRowValue(string name)
         {
             var values = (RowValues[])Enum.GetValues(typeof(RowValues));
             for (int i = 0; i < values.Length; i++)
