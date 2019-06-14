@@ -52,6 +52,20 @@ namespace CastleDBImporter
 
             return false;
         }
+
+        public static void UndoImport(string db)
+        {
+            // Destroy our text sub asset/ main obj that is created on import
+            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(db.Replace(Application.dataPath, "Assets"));
+            DestroyImmediate(text);
+            AssetDatabase.SaveAssets();
+
+            var path = CastleDBConfig.Instance().GeneratedTypesLocation + "/" + 
+
+            // Remove main obj from asset
+           // AssetDatabase.RemoveObjectFromAsset()
+            // Delete dir
+        }
     }
 
 }
