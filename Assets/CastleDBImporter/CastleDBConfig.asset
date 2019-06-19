@@ -15,6 +15,8 @@ MonoBehaviour:
   GUIDColumnName: id
   GeneratedTypesLocation: TestFolder/GeneratedTypes
   ImagesFolder: TestFolder/Images/Resources
-  TextFolder: TestFolder/Text
   GeneratedTypesNamespace: CompiledTypes
   SuppressBuildInfo: 1
+  Databases:
+  - path: C:/Users/ChampagneCat/Desktop/castledb-unity/Assets/CastleDBImporter\Sample\SampleCDBFile.cdb
+    loaded: 0

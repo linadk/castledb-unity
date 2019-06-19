@@ -13,6 +13,8 @@ namespace CastleDBImporter
     class CastleDBConfigEditor : Editor
     {
         CastleDBConfig comp;
+        private static GUIStyle ToggleButtonStyleNormal = null;
+        private static GUIStyle ToggleButtonStyleToggled = null;
 
         public void OnEnable()
         {
@@ -23,46 +25,41 @@ namespace CastleDBImporter
         {
             base.OnInspectorGUI();
 
+            // Set up styles
+            if (ToggleButtonStyleNormal == null)
+            {
+                ToggleButtonStyleNormal = "Button";
+                ToggleButtonStyleToggled = new GUIStyle(ToggleButtonStyleNormal);
+                ToggleButtonStyleToggled.normal.background = ToggleButtonStyleToggled.active.background;
+            }
 
-            var dbs = GetDatabases();
             EditorGUILayout.BeginFoldoutHeaderGroup(true, "Databases");
 
-            foreach( var db in dbs)
+            var localdb = CastleDBConfig.Instance().Databases;
+            for (int i = 0; i < localdb.Count; i++)
             {
-                Rect r = EditorGUILayout.BeginHorizontal("Button");
-                EditorGUILayout.Toggle(true);
-                EditorGUILayout.LabelField(db.Replace(Application.dataPath +"/" , ""));
-                EditorGUILayout.EndHorizontal();
+                if (GUILayout.Button(localdb[i].path.Replace(Application.dataPath + "/", ""), localdb[i].loaded ? ToggleButtonStyleNormal : ToggleButtonStyleToggled))
+                {
+                    localdb[i].loaded = !localdb[i].loaded;
+
+                    if (localdb[i].loaded) // LOAD
+                    {
+                        // Trigger import!
+                        Debug.Log("LOAD");
+                    }
+                    else // UNLOAD
+                    {
+                        CastleDBImporter.UndoImport(localdb[i].path);
+                        Debug.Log("UNLOAD");
+                    }
+                }
+
                 EditorGUILayout.Space();
             }
 
             EditorGUILayout.EndFoldoutHeaderGroup();
             // Make sure we save!
             EditorUtility.SetDirty(comp);
-        }
-
-        public string[] GetDatabases()
-        {
-            var dbs = new Dictionary<string, string>();
-
-            return Directory.GetFiles(Application.dataPath + "/", "*.cdb" , SearchOption.AllDirectories);
-        }
-
-        public GUIStyle GetDBLabelStyle(string db)
-        {
-            GUIStyle s = new GUIStyle(EditorStyles.textField);
-            s.normal.textColor = Color.green;
-
-            if (AssetDatabase.AssetPathToGUID(db.Replace(Application.dataPath , "Assets")) != "")
-            {
-                s.normal.textColor = Color.green;
-            }
-            else
-            {
-                s.normal.textColor = Color.red;
-            }
-
-            return s;
         }
     }
 }

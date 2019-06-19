@@ -57,14 +57,16 @@ namespace CastleDBImporter
         {
             // Destroy our text sub asset/ main obj that is created on import
             var text = AssetDatabase.LoadAssetAtPath<TextAsset>(db.Replace(Application.dataPath, "Assets"));
-            DestroyImmediate(text);
+            DestroyImmediate(text , true);
             AssetDatabase.SaveAssets();
 
-            var path = CastleDBConfig.Instance().GeneratedTypesLocation + "/" + 
-
-            // Remove main obj from asset
-           // AssetDatabase.RemoveObjectFromAsset()
-            // Delete dir
+            // Delete Dir
+            var name = Path.GetFileNameWithoutExtension(db);
+            var path = Application.dataPath + Path.DirectorySeparatorChar + CastleDBConfig.Instance().GeneratedTypesLocation + "/" + name;
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path , true); // Todo: This doesn't seem to work right
+            }
         }
     }
 
