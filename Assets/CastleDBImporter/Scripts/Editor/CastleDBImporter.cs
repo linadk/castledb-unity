@@ -17,6 +17,11 @@ namespace CastleDBImporter
 		public override void OnImportAsset(AssetImportContext ctx)
 		{
             if (HasDuplicateDB(ref ctx)) { Debug.LogWarning("Cannot load CastleDB database '" + ctx.assetPath + "' because a DB of the same name already exists! Please rename one of your .cdb files!"); return; }
+            if (!CastleDBConfig.Instance().CanLoad(ctx.assetPath))
+            {
+                return;
+            }
+
             dbname = Path.GetFileNameWithoutExtension(ctx.assetPath);
 
             TextAsset castle = new TextAsset(File.ReadAllText(ctx.assetPath));
@@ -67,6 +72,8 @@ namespace CastleDBImporter
             {
                 Directory.Delete(path , true); // Todo: This doesn't seem to work right
             }
+
+            CastleDBImageImporter.UndoImport(db);
         }
     }
 

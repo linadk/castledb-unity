@@ -45,7 +45,12 @@ namespace CastleDBImporter
             }
 
             return config;
+        }
 
+        public bool CanLoad(string path)
+        {
+            path = Path.GetFullPath(path.Replace("Assets", Application.dataPath));
+            return Databases.Find(x => Path.GetFullPath(x.path).Equals(path)).loaded;
         }
 
         public static string[] GetAllDBPaths()

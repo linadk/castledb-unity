@@ -13,6 +13,8 @@ namespace CastleDBImporter {
     [ScriptedImporter(2, "img")]
     public class CastleDBImageImporter : ScriptedImporter
     {
+        string fileName = "";
+
         JSONNode data = null;
         public override void OnImportAsset(AssetImportContext ctx)
         {
@@ -21,6 +23,7 @@ namespace CastleDBImporter {
 
             // Make Images Folder
             CastleDBGenerator.InitPath(CastleDBConfig.Instance().ImagesFolder);
+            fileName = Path.GetFileNameWithoutExtension(ctx.assetPath);
 
             // Import as TextAsset
             TextAsset images = new TextAsset(File.ReadAllText(ctx.assetPath));
@@ -54,7 +57,7 @@ namespace CastleDBImporter {
                 byte[] imgbytes = Convert.FromBase64String(data);
 
                 // Write file
-                File.WriteAllBytes(Application.dataPath + "/" + CastleDBConfig.Instance().ImagesFolder + "/" + img.Key + "." + GetFileExtension(meta), imgbytes);
+                File.WriteAllBytes(Application.dataPath + "/" + CastleDBConfig.Instance().ImagesFolder + "/" + fileName + "/Resources/" + img.Key + "." + GetFileExtension(meta), imgbytes);
 
                 data = null;
             }
@@ -64,6 +67,19 @@ namespace CastleDBImporter {
         public bool HasCorrespondingCDBFile(string assetpath)
         {
             assetpath.Replace(".img", ".cdb");
+
+            // No corresponding cdb file
+            if (!File.Exists(assetPath))
+            {
+                return false;
+            }
+
+            // Check to make sure it's actually loaded
+            if (!CastleDBConfig.Instance().CanLoad(assetpath))
+            {
+                return false;
+            }
+
             return File.Exists(assetpath);
         }
 
@@ -77,6 +93,27 @@ namespace CastleDBImporter {
             if (meta.Contains("GIF")) { return "gif"; }
 
             throw new System.Exception("Unsupported image meta found : '" + meta + "'");
+        }
+
+        public static void UndoImport(string db)
+        {
+            db = db.Replace(".cdb", ".img");
+
+            // RETURN: No image file
+            if (!File.Exists(db)) { return; }
+
+            // Destroy our text sub asset/ main obj that is created on import
+            var text = AssetDatabase.LoadAssetAtPath<TextAsset>(db.Replace(Application.dataPath, "Assets"));
+            DestroyImmediate(text, true);
+            AssetDatabase.SaveAssets();
+
+            // Delete Dir
+            var name = Path.GetFileNameWithoutExtension(db);
+            var path = Application.dataPath + Path.DirectorySeparatorChar + CastleDBConfig.Instance().ImagesFolder + "/" + name;
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
         }
     }
 }

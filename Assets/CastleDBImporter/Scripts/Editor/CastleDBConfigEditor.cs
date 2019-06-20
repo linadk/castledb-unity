@@ -38,19 +38,24 @@ namespace CastleDBImporter
             var localdb = CastleDBConfig.Instance().Databases;
             for (int i = 0; i < localdb.Count; i++)
             {
+                GUI.backgroundColor = localdb[i].loaded ? Color.green : Color.magenta;
                 if (GUILayout.Button(localdb[i].path.Replace(Application.dataPath + "/", ""), localdb[i].loaded ? ToggleButtonStyleNormal : ToggleButtonStyleToggled))
                 {
                     localdb[i].loaded = !localdb[i].loaded;
 
                     if (localdb[i].loaded) // LOAD
                     {
-                        // Trigger import!
-                        Debug.Log("LOAD");
+                        var assetpath = localdb[i].path.Replace(Application.dataPath, "Assets");
+
+                        AssetDatabase.ImportAsset(assetpath);
+                        AssetDatabase.ImportAsset(assetpath.Replace(".cdb", ".img"));
+                      
+                        AssetDatabase.Refresh();
                     }
                     else // UNLOAD
                     {
                         CastleDBImporter.UndoImport(localdb[i].path);
-                        Debug.Log("UNLOAD");
+                        AssetDatabase.Refresh();
                     }
                 }
 
