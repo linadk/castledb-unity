@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -50,12 +52,43 @@ namespace CastleDBImporter
         public bool CanLoad(string path)
         {
             path = Path.GetFullPath(path.Replace("Assets", Application.dataPath));
-            return Databases.Find(x => Path.GetFullPath(x.path).Equals(path)).loaded;
+
+            foreach( var db in Databases)
+            {
+                if (db.loaded)
+                {
+                    var loadedPath = Path.GetFullPath(db.path);
+                    if (loadedPath == path) { return true; }
+                }
+            }
+
+            return false;
         }
 
         public static string[] GetAllDBPaths()
         {
             return Directory.GetFiles(Application.dataPath + "/", "*.cdb", SearchOption.AllDirectories);
+        }
+
+        public static void DeleteDirectory(string path)
+        {
+            foreach (string directory in Directory.GetDirectories(path))
+            {
+                DeleteDirectory(directory);
+            }
+
+            try
+            {
+                Directory.Delete(path, true);
+            }
+            catch (IOException)
+            {
+                Directory.Delete(path, true);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                Directory.Delete(path, true);
+            }
         }
     }
 

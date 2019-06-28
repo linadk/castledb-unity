@@ -21,9 +21,10 @@ namespace CastleDBImporter {
             // Make sure this .img file is part of a CastleDB database
             if (!HasCorrespondingCDBFile(ctx.assetPath)) { return; }
 
-            // Make Images Folder
-            CastleDBGenerator.InitPath(CastleDBConfig.Instance().ImagesFolder);
             fileName = Path.GetFileNameWithoutExtension(ctx.assetPath);
+
+            // Create images folder
+            CastleDBGenerator.InitPath(CastleDBConfig.Instance().ImagesFolder + "/" + fileName + "/Resources/");
 
             // Import as TextAsset
             TextAsset images = new TextAsset(File.ReadAllText(ctx.assetPath));
@@ -110,9 +111,17 @@ namespace CastleDBImporter {
             // Delete Dir
             var name = Path.GetFileNameWithoutExtension(db);
             var path = Application.dataPath + Path.DirectorySeparatorChar + CastleDBConfig.Instance().ImagesFolder + "/" + name;
+            var metaFile = path + ".meta";
             if (Directory.Exists(path))
             {
-                Directory.Delete(path, true);
+                CastleDBConfig.DeleteDirectory(path);
+                //Directory.Delete(path, true);
+            }
+
+            // Get rid of the meta file to avoid meta file warnings!
+            if (File.Exists(metaFile))
+            {
+                File.Delete(metaFile);
             }
         }
     }

@@ -68,9 +68,17 @@ namespace CastleDBImporter
             // Delete Dir
             var name = Path.GetFileNameWithoutExtension(db);
             var path = Application.dataPath + Path.DirectorySeparatorChar + CastleDBConfig.Instance().GeneratedTypesLocation + "/" + name;
+            var metaFile = path + ".meta";
+
             if (Directory.Exists(path))
             {
-                Directory.Delete(path , true); // Todo: This doesn't seem to work right
+                CastleDBConfig.DeleteDirectory(path);
+                //Directory.Delete(path , true); // Todo: This doesn't seem to work right
+            }
+
+            if (File.Exists(metaFile))
+            {
+                File.Delete(metaFile);
             }
 
             CastleDBImageImporter.UndoImport(db);

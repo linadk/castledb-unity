@@ -19,4 +19,4 @@ MonoBehaviour:
   SuppressBuildInfo: 1
   Databases:
   - path: C:/Users/ChampagneCat/Desktop/castledb-unity/Assets/CastleDBImporter\Sample\SampleCDBFile.cdb
-    loaded: 1
+    loaded: 0
