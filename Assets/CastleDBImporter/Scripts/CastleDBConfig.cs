@@ -36,15 +36,12 @@ namespace CastleDBImporter
             var config = AssetDatabase.LoadAssetAtPath(path, typeof(CastleDBConfig)) as CastleDBConfig;
 
             // Load our db if we haven't
-            if(config.Databases == null || config.Databases.Count < 1)
+            if (config.Databases == null)
             {
                 config.Databases = new List<DatabaseConfigInfo>();
-                var dbpaths = GetAllDBPaths();
-                foreach(var dbpath in dbpaths)
-                {
-                    config.Databases.Add(new DatabaseConfigInfo(dbpath, false));
-                }
             }
+
+            config.UpdateDBs();
 
             return config;
         }
@@ -68,6 +65,31 @@ namespace CastleDBImporter
         public static string[] GetAllDBPaths()
         {
             return Directory.GetFiles(Application.dataPath + "/", "*.cdb", SearchOption.AllDirectories);
+        }
+
+        public void UpdateDBs()
+        {
+            var dbpaths = GetAllDBPaths();
+
+            // Remove deleted dbs
+            foreach(var db in Databases)
+            {
+                //Array no longer exists
+                if(!Array.Exists( dbpaths , element => element == db.path)){
+                    Databases.Remove(db);
+                    Debug.Log("Database " + db.path + " removed!");
+                }
+            }
+
+            // ADD : DB file exists but is in Databases
+            foreach( var dbpath in dbpaths)
+            {
+                if(!Databases.Exists( element=> element.path == dbpath))
+                {
+                    Databases.Add(new DatabaseConfigInfo(dbpath, false));
+                }
+            }
+
         }
 
         public static void DeleteDirectory(string path)

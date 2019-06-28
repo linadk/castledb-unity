@@ -41,7 +41,7 @@ namespace CastleDBImporter
 
         private bool HasDuplicateDB(ref AssetImportContext ctx)
         {
-            var dbname = Path.GetFileNameWithoutExtension(ctx.assetPath);
+            var dbname = Path.GetFileName(ctx.assetPath);
 
             var dupes = AssetDatabase.FindAssets(dbname);
 
