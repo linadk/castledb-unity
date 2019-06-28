@@ -66,7 +66,7 @@ namespace CastleDBImporter {
         // We use this to make sure we have a CDB file with our img file, otherwise it may not be a CastleDB img file.
         public bool HasCorrespondingCDBFile(string assetpath)
         {
-            assetpath.Replace(".img", ".cdb");
+            assetpath = assetpath.Replace(".img", ".cdb");
 
             // No corresponding cdb file
             if (!File.Exists(assetPath))
